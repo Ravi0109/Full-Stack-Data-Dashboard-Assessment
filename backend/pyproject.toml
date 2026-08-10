@@ -1,0 +1,23 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-p no:cacheprovider"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = '''
+/(
+  \.venv
+  | \.pytest_cache
+  | pytest-cache-files-.*
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [".venv", ".pytest_cache", "pytest-cache-files-*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

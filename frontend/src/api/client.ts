@@ -1,5 +1,7 @@
 import type {
   CurrencyContext,
+  ExternalRelationshipFilters,
+  ExternalRelationshipsResponse,
   Filters,
   Metadata,
   OrdersResponse,
@@ -101,6 +103,28 @@ export const api = {
 
   getCurrencyContext(signal?: AbortSignal) {
     return request<CurrencyContext>('/external/currency-context', { signal });
+  },
+
+  getCountryCurrencyPopulation(
+    filters: ExternalRelationshipFilters,
+    sort: SortState,
+    page: number,
+    pageSize: number,
+    signal?: AbortSignal,
+  ) {
+    return request<ExternalRelationshipsResponse>(
+      '/external/country-currency-population',
+      { signal },
+      {
+        region: filters.region,
+        population_min: filters.populationMin,
+        population_max: filters.populationMax,
+        sort_by: sort.sortBy,
+        sort_dir: sort.sortDir,
+        page,
+        page_size: pageSize,
+      },
+    );
   },
 
   ingestAll() {

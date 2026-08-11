@@ -28,6 +28,8 @@ The backend defaults to `http://127.0.0.1:5000`.
 
 `FLASK_DEBUG` is `false` in `.env.example` so the demo runs as a single local process. Set it to `true` only when you specifically want Flask's debug reloader.
 
+For REST Countries v5, put the provided key in `backend/.env` as `REST_COUNTRIES_API_KEY=...`. The tracked `.env.example` intentionally leaves that value blank.
+
 ## Frontend Setup
 
 ```powershell
@@ -199,5 +201,5 @@ Calls the REST Countries API configured in `.env` and summarizes countries that 
 
 - Source prices are treated as INR by default because no currency is present in the data.
 - Orders are delayed when shipment status says `Delayed` or delivery days exceed `DELAY_THRESHOLD_DAYS`.
-- REST Countries is used because it is specified in `Hit External API.xlsx`; a separate exchange-rate API is used for actual currency conversion because REST Countries does not provide rates.
+- REST Countries v5 is used because it is specified in `Hit External API.xlsx`; a separate exchange-rate API is used for actual currency conversion because REST Countries does not provide rates.
 - In-memory storage is sufficient for the sample dataset and keeps the transformation pipeline easy to review.

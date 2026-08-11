@@ -33,13 +33,43 @@ def load_orders(path: Path) -> list[RawOrder]:
 
 
 def _parse_json_with_repair(text: str) -> dict[str, Any]:
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
+    for candidate in _json_candidates(text):
+        try:
+            parsed = json.loads(candidate)
+            break
+        except json.JSONDecodeError:
+            continue
+    else:
         parsed = json.loads(unwrap_quoted_lines(text))
     if not isinstance(parsed, dict):
         raise ValueError("Orders.json must parse to a JSON object")
     return parsed
+
+
+def _json_candidates(text: str) -> list[str]:
+    unwrapped = unwrap_quoted_lines(text)
+    return [
+        text,
+        unwrapped,
+        _repair_orders_container(unwrapped),
+    ]
+
+
+def _repair_orders_container(text: str) -> str:
+    """Repair an observed export artifact with a missing top-level object/array close."""
+
+    repaired = text
+    stripped = repaired.lstrip()
+    if stripped.startswith('"orders"'):
+        repaired = "{\n" + repaired
+
+    missing_closing_arrays = repaired.count("[") - repaired.count("]")
+    if missing_closing_arrays > 0 and repaired.rstrip().endswith("}"):
+        insert_at = repaired.rfind("}")
+        closing_arrays = "\n" + "\n".join("  ]" for _ in range(missing_closing_arrays)) + "\n"
+        repaired = repaired[:insert_at] + closing_arrays + repaired[insert_at:]
+
+    return repaired
 
 
 def _parse_order(raw: dict[str, Any], index: int) -> RawOrder:

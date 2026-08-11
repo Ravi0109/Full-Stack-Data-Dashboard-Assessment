@@ -68,10 +68,14 @@ Source prices do not include a currency. The app assumes INR by default, configu
 
 The spreadsheet specifically names REST Countries API, so the backend uses it for currency/country context. Because REST Countries is not an exchange-rate API, the backend also uses a configurable no-key exchange-rate endpoint for conversion:
 
-- `REST_COUNTRIES_URL=https://restcountries.com/v3.1/all?fields=name,cca2,region,population,area,currencies`
+- `REST_COUNTRIES_URL=https://api.restcountries.com/countries/v5/currencies?q={currency}&response_fields=names.common,codes.alpha_2,region,population,area,currencies&limit=100`
+- `REST_COUNTRIES_ALL_URL=https://api.restcountries.com/countries/v5?response_fields=names.common,codes.alpha_2,region,population,area,currencies&limit={limit}&offset={offset}`
+- `REST_COUNTRIES_API_KEY` is read from `backend/.env` and sent as a bearer token.
 - `EXCHANGE_RATE_URL=https://open.er-api.com/v6/latest`
 
 Both clients have short timeouts and fallback responses so dashboard data still loads when the network or public APIs are unavailable.
+
+The external relationship dashboard normalizes nested REST Countries records into country-currency rows. Countries with multiple currencies intentionally produce multiple rows because the relationship being explored is country -> currency -> population, not just country metadata.
 
 Fallback responses intentionally expose concise user-safe messages rather than raw exception text. This prevents local proxy, DNS, timeout, or public API errors from leaking implementation details into the dashboard while still making the fallback status explicit.
 
@@ -80,6 +84,8 @@ Fallback responses intentionally expose concise user-safe messages rather than r
 `FLASK_DEBUG` defaults to `false` for `backend/run.py` and `.env.example` so the local launcher uses a single Flask process. Developers can set `FLASK_DEBUG=true` while actively debugging, but the assessment demo avoids the debug reloader because stale workers can keep old API responses alive on port `5000`.
 
 The backend loads an optional project-root `.env` first and then `backend/.env` with override enabled. This matches the README setup while still allowing repo-level defaults if the app is embedded into a larger environment.
+
+External API calls use a `requests.Session` with `trust_env` controlled by `EXTERNAL_API_TRUST_ENV_PROXY`, defaulting to `false`. This avoids a common local assessment failure where inherited proxy variables point HTTPS traffic at an unavailable localhost proxy.
 
 ## API Shape
 

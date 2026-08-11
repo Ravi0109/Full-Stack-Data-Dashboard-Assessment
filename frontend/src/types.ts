@@ -130,4 +130,54 @@ export type CurrencyContext = {
   }>;
 };
 
+export type ExternalRelationshipFilters = {
+  region: string;
+  populationMin: string;
+  populationMax: string;
+};
+
+export type ExternalRelationshipRow = {
+  country: string;
+  country_code: string;
+  region: string;
+  currency_code: string;
+  currency_name: string;
+  currency_symbol: string | null;
+  population: number;
+  area: number;
+  population_density: number | null;
+};
+
+export type ExternalRelationshipsResponse = {
+  status: string;
+  source: string;
+  updated_at: string;
+  error?: string;
+  data: ExternalRelationshipRow[];
+  pagination: Pagination;
+  filters: {
+    region: string | null;
+    population_min: number | null;
+    population_max: number | null;
+  };
+  sort: {
+    sort_by: string;
+    sort_dir: SortDirection;
+  };
+  regions: string[];
+  metrics: {
+    relationship_count: number;
+    country_count: number;
+    currency_count: number;
+    total_population: number;
+    average_population_density: number | null;
+  };
+  density_comparison: Array<{
+    country: string;
+    country_code: string;
+    region: string;
+    population_density: number | null;
+  }>;
+};
+
 export type ChartView = 'revenue' | 'orders';

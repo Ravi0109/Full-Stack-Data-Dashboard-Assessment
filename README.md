@@ -26,6 +26,8 @@ py run.py
 
 The backend defaults to `http://127.0.0.1:5000`.
 
+`FLASK_DEBUG` is `false` in `.env.example` so the demo runs as a single local process. Set it to `true` only when you specifically want Flask's debug reloader.
+
 ## Frontend Setup
 
 ```powershell

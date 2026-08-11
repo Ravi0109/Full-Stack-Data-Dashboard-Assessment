@@ -128,58 +128,82 @@ export function DashboardProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     setMetadataLoading(true);
     setMetadataError(undefined);
     api
       .getMetadata(controller.signal)
       .then(setMetadata)
       .catch((error: Error) => {
-        if (error.name !== 'AbortError') setMetadataError(error.message);
+        if (active && error.name !== 'AbortError') setMetadataError(error.message);
       })
-      .finally(() => setMetadataLoading(false));
-    return () => controller.abort();
+      .finally(() => {
+        if (active) setMetadataLoading(false);
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [refreshKey]);
 
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     setOrdersLoading(true);
     setOrdersError(undefined);
     api
       .getOrders(filters, sort, page, pageSize, controller.signal)
       .then(setOrders)
       .catch((error: Error) => {
-        if (error.name !== 'AbortError') setOrdersError(error.message);
+        if (active && error.name !== 'AbortError') setOrdersError(error.message);
       })
-      .finally(() => setOrdersLoading(false));
-    return () => controller.abort();
+      .finally(() => {
+        if (active) setOrdersLoading(false);
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [filters, sort, page, pageSize, refreshKey]);
 
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     setSummaryLoading(true);
     setSummaryError(undefined);
     api
       .getSummary(filters, controller.signal)
       .then(setSummary)
       .catch((error: Error) => {
-        if (error.name !== 'AbortError') setSummaryError(error.message);
+        if (active && error.name !== 'AbortError') setSummaryError(error.message);
       })
-      .finally(() => setSummaryLoading(false));
-    return () => controller.abort();
+      .finally(() => {
+        if (active) setSummaryLoading(false);
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [filters, refreshKey]);
 
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     setExternalLoading(true);
     setExternalError(undefined);
     api
       .getCurrencyContext(controller.signal)
       .then(setCurrencyContext)
       .catch((error: Error) => {
-        if (error.name !== 'AbortError') setExternalError(error.message);
+        if (active && error.name !== 'AbortError') setExternalError(error.message);
       })
-      .finally(() => setExternalLoading(false));
-    return () => controller.abort();
+      .finally(() => {
+        if (active) setExternalLoading(false);
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [refreshKey]);
 
   const value = useMemo<DashboardContextValue>(
@@ -237,6 +261,7 @@ export function DashboardProvider({ children }: PropsWithChildren) {
       setSort,
       setPage,
       setPageSize,
+      setChartView,
       setSelectedOrderId,
       refresh,
     ],

@@ -4,6 +4,8 @@
 
 The frontend uses Vite with React and TypeScript. Vite is faster and lighter than Create React App for this assessment, has a straightforward dev server, and keeps the project structure easy to review.
 
+The Vite build splits React, charting, and icon dependencies into explicit chunks. Recharts is the only heavy dependency, so the warning limit is set to `650 KB` for that isolated vendor chart chunk while keeping app code and icons in smaller cacheable assets.
+
 ## Storage
 
 The backend uses an in-memory repository. The source dataset is very small, the exercise emphasizes transformation logic, and the problem statement explicitly allows in-memory storage. The repository is still isolated behind service classes so it can be replaced with SQLite or PostgreSQL without rewriting route handlers.
@@ -70,6 +72,14 @@ The spreadsheet specifically names REST Countries API, so the backend uses it fo
 - `EXCHANGE_RATE_URL=https://open.er-api.com/v6/latest`
 
 Both clients have short timeouts and fallback responses so dashboard data still loads when the network or public APIs are unavailable.
+
+Fallback responses intentionally expose concise user-safe messages rather than raw exception text. This prevents local proxy, DNS, timeout, or public API errors from leaking implementation details into the dashboard while still making the fallback status explicit.
+
+## Local Runtime
+
+`FLASK_DEBUG` defaults to `false` for `backend/run.py` and `.env.example` so the local launcher uses a single Flask process. Developers can set `FLASK_DEBUG=true` while actively debugging, but the assessment demo avoids the debug reloader because stale workers can keep old API responses alive on port `5000`.
+
+The backend loads an optional project-root `.env` first and then `backend/.env` with override enabled. This matches the README setup while still allowing repo-level defaults if the app is embedded into a larger environment.
 
 ## API Shape
 

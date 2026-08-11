@@ -59,7 +59,9 @@ class ExternalApiClient:
         if cached := self._get_cached(cache_key):
             return cached
 
-        fallback = self._exchange_fallback(base, target, "External APIs are disabled")
+        fallback = self._exchange_fallback(
+            base, target, "External exchange-rate data is unavailable."
+        )
         if not self.enabled:
             self._set_cached(cache_key, fallback)
             return fallback
@@ -80,8 +82,10 @@ class ExternalApiClient:
                 or payload.get("time_last_update")
                 or datetime.now(UTC).isoformat(),
             }
-        except Exception as exc:
-            result = self._exchange_fallback(base, target, str(exc))
+        except Exception:
+            result = self._exchange_fallback(
+                base, target, "External exchange-rate data is unavailable."
+            )
 
         self._set_cached(cache_key, result)
         return result
@@ -94,7 +98,9 @@ class ExternalApiClient:
         if cached := self._get_cached(cache_key):
             return cached
 
-        fallback = self._currency_context_fallback(currency, "External APIs are disabled")
+        fallback = self._currency_context_fallback(
+            currency, "REST Countries data is temporarily unavailable."
+        )
         if not self.enabled:
             self._set_cached(cache_key, fallback)
             return fallback
@@ -121,8 +127,10 @@ class ExternalApiClient:
                 "top_countries": top_countries,
                 "updated_at": datetime.now(UTC).isoformat(),
             }
-        except Exception as exc:
-            result = self._currency_context_fallback(currency, str(exc))
+        except Exception:
+            result = self._currency_context_fallback(
+                currency, "REST Countries data is temporarily unavailable."
+            )
 
         self._set_cached(cache_key, result)
         return result

@@ -11,13 +11,15 @@ from dotenv import load_dotenv
 class Config:
     """Flask configuration with conservative local defaults."""
 
-    ROOT_DIR = Path(__file__).resolve().parents[2]
-    PROJECT_DIR = ROOT_DIR.parent
+    PROJECT_DIR = Path(__file__).resolve().parents[2]
+    BACKEND_DIR = Path(__file__).resolve().parents[1]
+    ROOT_DIR = PROJECT_DIR
 
-    load_dotenv(ROOT_DIR / ".env")
+    load_dotenv(PROJECT_DIR / ".env")
+    load_dotenv(BACKEND_DIR / ".env", override=True)
 
     LOAD_ON_STARTUP = os.getenv("LOAD_ON_STARTUP", "true").lower() == "true"
-    FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+    FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173,http://127.0.0.1:5173")
     CORS_ORIGINS = [origin.strip() for origin in FRONTEND_ORIGIN.split(",") if origin.strip()]
 
     DATA_DIR = os.getenv("DATA_DIR", "data")

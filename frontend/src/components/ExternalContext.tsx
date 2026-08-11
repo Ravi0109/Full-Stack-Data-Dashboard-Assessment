@@ -46,8 +46,8 @@ export function ExternalContext() {
       ) : (
         <StatusMessage
           state="empty"
-          title="External API fallback active"
-          detail={currencyContext.error}
+          title="Country context is temporarily unavailable"
+          detail="The dashboard is using local order data and will retry REST Countries on the next refresh."
         />
       )}
     </section>

@@ -7,7 +7,9 @@ import type {
   SummaryResponse,
 } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const browserHost = typeof window === 'undefined' ? '127.0.0.1' : window.location.hostname;
+const API_URL = (configuredApiUrl || `http://${browserHost}:5000`).replace(/\/$/, '');
 
 class ApiRequestError extends Error {
   status: number;
@@ -34,13 +36,21 @@ function buildUrl(path: string, params?: Record<string, QueryValue>) {
 }
 
 async function request<T>(path: string, options?: RequestInit, params?: Record<string, QueryValue>) {
-  const response = await fetch(buildUrl(path, params), {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-    ...options,
-  });
+  const headers = new Headers(options?.headers);
+  if (options?.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(buildUrl(path, params), { ...options, headers });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error;
+    throw new ApiRequestError(
+      `Unable to reach the backend at ${API_URL}. Start Flask or set VITE_API_URL.`,
+      0,
+    );
+  }
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
